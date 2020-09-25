@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
+import numpy as np
 import rospy
 from sensor_msgs.msg import LaserScan
-
-import numpy as np
 from rospy.numpy_msg import numpy_msg 
 
 class LIDAR_RYCSV:
@@ -22,7 +21,7 @@ class LIDAR_RYCSV:
 
         # Polling con callback
         rate = rospy.Rate(20) # 20 Hz
-
+        rospy.loginfo(type(np.array([1,1])))
         while (not rospy.is_shutdown()):
 
             self.pub.publish(self.newMsg)
@@ -38,5 +37,13 @@ class LIDAR_RYCSV:
         #new_msgLaserScan.ranges > 10 m   == 0
         #new_msgLaserScan.ranges < 0.5 m  == 0
 
+        #rospy.loginfo(new_msgRanges.shape)
+        for i in range(new_msgRanges.shape[0]):
+            if new_msgRanges[i]>10 or new_msgRanges[i]<0.5:
+                new_msgRanges[i]=0
+
+
+        #new_msgRanges = np.array([0 if (new_msgRanges[i]>10 or new_msgRanges[i]<0.5) else new_msgRanges[i] for i in range(new_msgRanges.shape[0])])
+        #new_msgRanges = np.array([0 if (i>10 or i<0.5) else i for i in new_msgRanges],dtype=np.float)
         new_msgLaserScan.ranges = new_msgRanges
         self.newMsg = new_msgLaserScan
